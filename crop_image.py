@@ -3,18 +3,21 @@ import os
 import cv2
 import copy
 import numpy as np
-from tools.infer.utility import draw_ocr_box_txt, get_rotate_crop_image
+from paddleocr.tools.infer.utility import draw_ocr_box_txt, get_rotate_crop_image
 
 def print_draw_crop_rec_res( img_crop_list, img_name):
         bbox_num = len(img_crop_list)
         for bno in range(bbox_num):
           crop_name=img_name+'_'+str(bno)+'.jpg'
-          crop_name_w = "./train/img_crop/{}".format(crop_name)
+          crop_name_w = "./data/vietnamese/train/img_crop/{}".format(crop_name)
           cv2.imwrite(crop_name_w, img_crop_list[bno])
           crop_label.write("{0}\t{1}\n".format(crop_name, text[bno]))
 
-crop_label = open('./train/crop_label.txt','w')
-with open('./train/train_label.txt','r') as file_text:
+if not os.path.exists('./data/vietnamese/train/'):
+  os.mkdir('./data/vietnamese/train/') 
+
+crop_label = open('./data/vietnamese/train/crop_label.txt','w', encoding='utf8')
+with open('./data/train_label.txt','r', encoding='utf8') as file_text:
   img_files=file_text.readlines()
   
 count=0
@@ -33,7 +36,7 @@ for img_file in img_files:
     dt_boxes.append(bb)
     text.append(i['transcription'])
 
-  image_file = './train/vietnamese/train_images/' +img_file.split('\t')[0]
+  image_file = './data/vietnamese/train_images/' +img_file.split('\t')[0]
   img = cv2.imread(image_file)
   ori_im=img.copy()
   img_crop_list=[]
@@ -44,8 +47,8 @@ for img_file in img_files:
     img_crop_list.append(img_crop)
   img_name = img_file.split('\t')[0].split('.')[0]
   
-  if not os.path.exists('./train/img_crop'):
-    os.mkdir('./train/img_crop') 
+  if not os.path.exists('./data/vietnamese/train/img_crop'):
+    os.mkdir('./data/vietnamese/train/img_crop') 
   print_draw_crop_rec_res(img_crop_list,img_name)
 
 

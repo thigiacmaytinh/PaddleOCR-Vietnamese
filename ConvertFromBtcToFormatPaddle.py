@@ -5,7 +5,7 @@ import pandas as pd
 import json
 import glob
 
-root_path = glob.glob('/content/vietnamese/labels/*')
+root_path = glob.glob('./vietnamese/labels/*')
 
 train_label = open("train_label.txt","w")
 test_label = open("test_label.txt","w")

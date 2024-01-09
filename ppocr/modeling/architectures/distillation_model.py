@@ -21,7 +21,7 @@ from ppocr.modeling.backbones import build_backbone
 from ppocr.modeling.necks import build_neck
 from ppocr.modeling.heads import build_head
 from .base_model import BaseModel
-from ppocr.utils.save_load import init_model, load_pretrained_params
+from ppocr.utils.save_load import load_pretrained_params
 
 __all__ = ['DistillationModel']
 
@@ -53,8 +53,8 @@ class DistillationModel(nn.Layer):
             self.model_list.append(self.add_sublayer(key, model))
             self.model_name_list.append(key)
 
-    def forward(self, x):
+    def forward(self, x, data=None):
         result_dict = dict()
         for idx, model_name in enumerate(self.model_name_list):
-            result_dict[model_name] = self.model_list[idx](x)
+            result_dict[model_name] = self.model_list[idx](x, data)
         return result_dict

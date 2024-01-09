@@ -1,7 +1,8 @@
 Global:
   debug: false
-  use_gpu: true
-  epoch_num: 300
+  # use_gpu: true
+  use_gpu: false
+  epoch_num: 100
   log_smooth_window: 20
   print_batch_step: 2
   save_model_dir: ./output/SAST/
@@ -52,8 +53,8 @@ Metric:
 Train:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train/vietnamese/train_images
-    label_file_list: [ ./train/train_label.txt ]
+    data_dir: ./data/vietnamese/train_images
+    label_file_list: [ ./data/train_label.txt ]
     ratio_list: [1]
     transforms:
     - DecodeImage:
@@ -84,9 +85,9 @@ Train:
 Eval:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train/vietnamese/test_image
+    data_dir: ./data/vietnamese/test_image
     label_file_list:
-    - ./train/test_label.txt
+    - ./data/test_label.txt
     transforms:
     - DecodeImage:
         img_mode: BGR

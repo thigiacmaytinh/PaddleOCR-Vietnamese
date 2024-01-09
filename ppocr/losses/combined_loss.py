@@ -15,9 +15,18 @@
 import paddle
 import paddle.nn as nn
 
-from .distillation_loss import DistillationCTCLoss
-from .distillation_loss import DistillationDMLLoss
+from .rec_ctc_loss import CTCLoss
+from .center_loss import CenterLoss
+from .ace_loss import ACELoss
+from .rec_sar_loss import SARLoss
+
+from .distillation_loss import DistillationCTCLoss, DistillCTCLogits
+from .distillation_loss import DistillationSARLoss, DistillationNRTRLoss
+from .distillation_loss import DistillationDMLLoss, DistillationKLDivLoss, DistillationDKDLoss
 from .distillation_loss import DistillationDistanceLoss, DistillationDBLoss, DistillationDilaDBLoss
+from .distillation_loss import DistillationVQASerTokenLayoutLMLoss, DistillationSERDMLLoss
+from .distillation_loss import DistillationLossFromOutput
+from .distillation_loss import DistillationVQADistanceLoss
 
 
 class CombinedLoss(nn.Layer):

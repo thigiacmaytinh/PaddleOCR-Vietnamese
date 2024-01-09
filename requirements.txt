@@ -1,11 +1,11 @@
 shapely
 scikit-image==0.17.2
 imgaug==0.4.0
-pyclipper
-lmdb
+pyclipper==1.3.0.post5
+lmdb==1.4.1
 tqdm
 numpy
-visualdl
+visualdl==2.5.3
 python-Levenshtein
 opencv-contrib-python==4.4.0.46
 lxml

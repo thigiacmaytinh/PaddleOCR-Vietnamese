@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,26 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import math
 import numpy as np
 import paddle
-from paddle import ParamAttr
+from paddle import ParamAttr, reshape, transpose
 import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import KaimingNormal
-import math
-import numpy as np
-import paddle
-from paddle import ParamAttr, reshape, transpose, concat, split
-import paddle.nn as nn
-import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
-from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
-from paddle.nn.initializer import KaimingNormal
-import math
-from paddle.nn.functional import hardswish, hardsigmoid
 from paddle.regularizer import L2Decay
+from paddle.nn.functional import hardswish, hardsigmoid
 
 
 class ConvBNLayer(nn.Layer):
@@ -112,7 +103,13 @@ class DepthwiseSeparable(nn.Layer):
 
 
 class MobileNetV1Enhance(nn.Layer):
-    def __init__(self, in_channels=3, scale=0.5, **kwargs):
+    def __init__(self,
+                 in_channels=3,
+                 scale=0.5,
+                 last_conv_stride=1,
+                 last_pool_type='max',
+                 last_pool_kernel_size=[3, 2],
+                 **kwargs):
         super().__init__()
         self.scale = scale
         self.block_list = []
@@ -209,7 +206,7 @@ class MobileNetV1Enhance(nn.Layer):
             num_filters1=1024,
             num_filters2=1024,
             num_groups=1024,
-            stride=1,
+            stride=last_conv_stride,
             dw_size=5,
             padding=2,
             use_se=True,
@@ -217,8 +214,13 @@ class MobileNetV1Enhance(nn.Layer):
         self.block_list.append(conv6)
 
         self.block_list = nn.Sequential(*self.block_list)
-
-        self.pool = nn.MaxPool2D(kernel_size=2, stride=2, padding=0)
+        if last_pool_type == 'avg':
+            self.pool = nn.AvgPool2D(
+                kernel_size=last_pool_kernel_size,
+                stride=last_pool_kernel_size,
+                padding=0)
+        else:
+            self.pool = nn.MaxPool2D(kernel_size=2, stride=2, padding=0)
         self.out_channels = int(1024 * scale)
 
     def forward(self, inputs):

@@ -433,5 +433,4 @@ class EASTProcessTrain(object):
         data['score_map'] = score_map
         data['geo_map'] = geo_map
         data['training_mask'] = training_mask
-        # print(im.shape, score_map.shape, geo_map.shape, training_mask.shape)
         return data

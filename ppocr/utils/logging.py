@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ logger_initialized = {}
 
 
 @functools.lru_cache()
-def get_logger(name='root', log_file=None, log_level=logging.DEBUG):
+def get_logger(name='ppocr', log_file=None, log_level=logging.DEBUG):
     """Initialize and get a logger by name.
     If the logger has not been initialized, this method will initialize the
     logger by adding one or two handlers, otherwise the initialized logger will
@@ -66,4 +66,5 @@ def get_logger(name='root', log_file=None, log_level=logging.DEBUG):
     else:
         logger.setLevel(logging.ERROR)
     logger_initialized[name] = True
+    logger.propagate = False
     return logger

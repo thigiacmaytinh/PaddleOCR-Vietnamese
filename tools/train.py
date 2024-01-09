@@ -36,6 +36,7 @@ from ppocr.optimizer import build_optimizer
 from ppocr.postprocess import build_post_process
 from ppocr.metrics import build_metric
 from ppocr.utils.save_load import init_model, load_dygraph_params
+from ppocr.utils.save_load import load_pretrained_params
 import tools.program as program
 
 dist.get_world_size()
@@ -92,7 +93,7 @@ def main(config, device, logger, vdl_writer):
         config['Optimizer'],
         epochs=config['Global']['epoch_num'],
         step_each_epoch=len(train_dataloader),
-        parameters=model.parameters())
+        model=model)
 
     # build metric
     eval_class = build_metric(config['Metric'])

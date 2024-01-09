@@ -20,32 +20,34 @@ from tqdm import tqdm
 
 from ppocr.utils.logging import get_logger
 
+MODELS_DIR = os.path.expanduser("~/.paddleocr/models/")
+
 
 def download_with_progressbar(url, save_path):
     logger = get_logger()
     response = requests.get(url, stream=True)
-    total_size_in_bytes = int(response.headers.get('content-length', 0))
-    block_size = 1024  # 1 Kibibyte
-    progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
-    with open(save_path, 'wb') as file:
-        for data in response.iter_content(block_size):
-            progress_bar.update(len(data))
-            file.write(data)
-    progress_bar.close()
-    if total_size_in_bytes == 0 or progress_bar.n != total_size_in_bytes:
+    if response.status_code == 200:
+        total_size_in_bytes = int(response.headers.get('content-length', 1))
+        block_size = 1024  # 1 Kibibyte
+        progress_bar = tqdm(
+            total=total_size_in_bytes, unit='iB', unit_scale=True)
+        with open(save_path, 'wb') as file:
+            for data in response.iter_content(block_size):
+                progress_bar.update(len(data))
+                file.write(data)
+        progress_bar.close()
+    else:
         logger.error("Something went wrong while downloading models")
         sys.exit(0)
 
 
 def maybe_download(model_storage_directory, url):
     # using custom model
-    tar_file_name_list = [
-        'inference.pdiparams', 'inference.pdiparams.info', 'inference.pdmodel'
-    ]
+    tar_file_name_list = ['.pdiparams', '.pdiparams.info', '.pdmodel']
     if not os.path.exists(
             os.path.join(model_storage_directory, 'inference.pdiparams')
     ) or not os.path.exists(
-        os.path.join(model_storage_directory, 'inference.pdmodel')):
+            os.path.join(model_storage_directory, 'inference.pdmodel')):
         assert url.endswith('.tar'), 'Only supports tar compressed package'
         tmp_path = os.path.join(model_storage_directory, url.split('/')[-1])
         print('download {} to {}'.format(url, tmp_path))
@@ -55,8 +57,8 @@ def maybe_download(model_storage_directory, url):
             for member in tarObj.getmembers():
                 filename = None
                 for tar_file_name in tar_file_name_list:
-                    if tar_file_name in member.name:
-                        filename = tar_file_name
+                    if member.name.endswith(tar_file_name):
+                        filename = 'inference' + tar_file_name
                 if filename is None:
                     continue
                 file = tarObj.extractfile(member)
@@ -65,6 +67,18 @@ def maybe_download(model_storage_directory, url):
                         'wb') as f:
                     f.write(file.read())
         os.remove(tmp_path)
+
+
+def maybe_download_params(model_path):
+    if os.path.exists(model_path) or not is_link(model_path):
+        return model_path
+    else:
+        url = model_path
+    tmp_path = os.path.join(MODELS_DIR, url.split('/')[-1])
+    print('download {} to {}'.format(url, tmp_path))
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    download_with_progressbar(url, tmp_path)
+    return tmp_path
 
 
 def is_link(s):
